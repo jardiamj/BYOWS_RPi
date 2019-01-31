@@ -111,7 +111,7 @@ class BYO_RPi_Station(object):
     """ Object that represents a BYO_Station. """
     
     def __init__(self):
-        """ Initialized Onject. """
+        """ Initialized Object. """
         self.wind_count = 0 # Counts how many half-rotations
         self.radius_cm = 9.0 # Radius of your anemometer
         self.rain_count = 0
