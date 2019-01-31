@@ -55,7 +55,7 @@ def confeditor_loader():
 """
 
 def logmsg(level, msg):
-    syslog.syslog(level, 'Weather Monitor II: %s' % msg)
+    syslog.syslog(level, 'BYOWS RPi: %s' % msg)
 
 def logdbg(msg):
     logmsg(syslog.LOG_DEBUG, msg)
