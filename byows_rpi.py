@@ -36,7 +36,7 @@ import ds18b20_therm
 import weewx.drivers
 import weewx.wxformulas
 
-DRIVER_NAME = 'byows'
+DRIVER_NAME = 'BYOWS'
 DRIVER_VERSION = '0.1'
 
 wind_interval = 1 # How often (secs) to sample speed
