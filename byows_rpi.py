@@ -84,28 +84,29 @@ class BYOWS_RPi(weewx.drivers.AbstractDevice):
     def genLoopPackets(self):
         store_speeds = []
         store_directions = []
+        temp_probe = ds18b20_therm.DS18B20()
         while True:
             start_time = time.time()
-                while time.time() - start_time <= interval:
-                    wind_start_time = time.time()
-                    self.station.reset_wind()
-                    while time.time() - wind_start_time <= wind_interval:
-                       store_directions.append(wind_direction_byo_5.get_value())
+            while time.time() - start_time <= interval:
+                wind_start_time = time.time()
+                self.station.reset_wind()
+                while time.time() - wind_start_time <= wind_interval:
+                   store_directions.append(wind_direction_byo_5.get_value())
 
-                    final_speed = self.station.calculate_speed(wind_interval)# Add this speed to the list
-                    store_speeds.append(final_speed)
-                wind_average = wind_direction_byo_5.get_average(store_directions)
-                wind_gust = max(store_speeds)
-                wind_speed = statistics.mean(store_speeds)
-                rainfall = self.station.get_rainfall()
-                store_speeds = []
-                store_directions = []
+                final_speed = self.station.calculate_speed(wind_interval)# Add this speed to the list
+                store_speeds.append(final_speed)
+            wind_average = wind_direction_byo_5.get_average(store_directions)
+            wind_gust = max(store_speeds)
+            wind_speed = statistics.mean(store_speeds)
+            rainfall = self.station.get_rainfall()
+            store_speeds = []
+            store_directions = []
 
-                ground_temp = temp_probe.read_temp()
-                humidity, pressure, ambient_temp = bme280_sensor_2.read_all()
+            ground_temp = temp_probe.read_temp()
+            humidity, pressure, ambient_temp = bme280_sensor_2.read_all()
 
             packet = {'dateTime': int(time.time() + 0.5),
-                      'usUnits': weewx.US}
+                      'usUnits': weewx.METRIC}
   
             packet['outTemp'] = float( ambient_temp )
             packet['outHumidity'] = float( humidity )
@@ -114,7 +115,7 @@ class BYOWS_RPi(weewx.drivers.AbstractDevice):
             packet['rain'] = rainfall
             packet['windDir'] = float( wind_average )
             packet['windSpeed'] = float( wind_speed )
-            packet['windGust'] = float( self.wind_gust )
+            packet['windGust'] = float( wind_gust )
 
             yield packet
 
