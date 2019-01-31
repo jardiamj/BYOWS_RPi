@@ -86,7 +86,7 @@ class BYOWS_RPi(weewx.drivers.AbstractDevice):
             start_time = time.time()
                 while time.time() - start_time <= interval:
                     wind_start_time = time.time()
-                    station.reset_wind()
+                    self.station.reset_wind()
                     while time.time() - wind_start_time <= wind_interval:
                        store_directions.append(wind_direction_byo_5.get_value())
 
