@@ -82,6 +82,8 @@ class BYOWS_RPi(weewx.drivers.AbstractDevice):
         return self.hardware
     
     def genLoopPackets(self):
+        store_speeds = []
+        store_directions = []
         while True:
             start_time = time.time()
                 while time.time() - start_time <= interval:
