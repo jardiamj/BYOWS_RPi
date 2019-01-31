@@ -26,7 +26,7 @@ import ds18b20_therm
 import weewx.drivers
 import weewx.wxformulas
 
-DRIVER_NAME = 'BYOWS'
+DRIVER_NAME = 'byows'
 DRIVER_VERSION = '0.1'
 
 wind_interval = 1 # How often (secs) to sample speed
@@ -37,11 +37,11 @@ ADJUSTMENT = 1.18
 BUCKET_SIZE = 0.2794
 
 def loader(config_dict, _):
-    return BYOWS(**config_dict[DRIVER_NAME])
+    return BYOWS_RPi(**config_dict[DRIVER_NAME])
 
 """
 def confeditor_loader():
-    return BYOWSConfEditor()
+    return BYOWS_RPiConfEditor()
 """
 
 def logmsg(level, msg):
@@ -56,7 +56,7 @@ def loginf(msg):
 def logerr(msg):
     logmsg(syslog.LOG_ERR, msg)
     
-class BYOWS(weewx.drivers.AbstractDevice):
+class BYOWS_RPi(weewx.drivers.AbstractDevice):
     """weewx driver for the Build Your Own Weather Station - Raspberry Pi
     
     """
