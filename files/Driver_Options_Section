@@ -1,0 +1,32 @@
+
+[BYOWS]
+    # This section is for the Raspberry Pi Bring Your Own Weather Station driver.
+       
+    # The driver to use.
+    driver = user.byows
+
+    # Pin to which anemometer is connected, the DEFAULT is pin 5.
+    anemometer_pin = 5
+    
+    # Pin to which rain bucket is connected, the DEFAULT is pin 6.
+    rain_bucket_pin = 6
+    
+    # Port and address for sensor bme280, the DEFAULT are port=1 address=0x76
+    # that is i2c port 1 in the Pi. common bme280 addresses are 0x77 and 0x76
+    bme280_port = 1
+    bme280_address = 0x76
+    
+    # Channel to which wind vane is connected to on MCP3008, The DEFAULT is channel 0
+    mcp3008_channel = 0
+    
+    # Anemometer adjustment value, the DEFAULT is 1.18
+    anemometer_adjustment = 1.18
+    
+    # Bucket Size in mm, the DEFAULT is 0.2794 mm.
+    bucket_size = 0.2794
+    
+    # Anemometer radious in cm, the DEFAULT is 9.0 cm.    
+    anemometer_radius_cm = 9.0
+        
+        
+

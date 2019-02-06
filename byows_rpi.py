@@ -34,7 +34,7 @@ import smbus2
 import weewx.drivers
 
 DRIVER_NAME = 'BYOWS'
-DRIVER_VERSION = '0.2'
+DRIVER_VERSION = '0.3'
 
 
 def loader(config_dict, _):
@@ -63,10 +63,29 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
     
     """
     def __init__(self, **stn_dict):
-        self.hardware = "BYOWS - Raspberry Pi"
+        self.hardware = stn_dict.get('hardware', "BYOWS - Raspberry Pi")
+        adjustment = stn_dict.get('anemometer_adjustment')
+        bucket_size = stn_dict.get('bucket_size')
+        anemometer_radius_cm = stn_dict.get('anemometer_radius_cm')
+        
+        settings = dict()
+        settings['anemometer_pin'] = stn_dict.get('anemometer_pin', 5)
+        settings['rain_bucket_pin'] = stn_dict.get('rain_bucket_pin', 6)
+        settings['bme280_port'] = stn_dict.get('bme280_port', 1)
+        settings['bme280_address'] = stn_dict.get('bme280_address', 0x76)
+        settings['mcp3008_channel'] = stn_dict.get('mcp3008_channel', 0)
+        
         loginf('using driver %s' % DRIVER_NAME)
         loginf('driver version is %s' % DRIVER_VERSION)
-        self.station = ByowsRpiStation()
+        
+        self.station = ByowsRpiStation(**settings)
+        
+        if adjustment != None:
+            self.station.ADJUSTMENT = adjustment
+        if bucket_size != None:
+            self.station.BUCKET_SIZE = bucket_size
+        if anemometer_radius_cm != None:
+            self.station.ANEMOMETER_RAIUS_CM = anemometer_radius_cm
         
     @property
     def hardware_name(self):
@@ -91,21 +110,24 @@ class ByowsRpiStation(object):
     ADJUSTMENT = 1.18
     BUCKET_SIZE = 0.2794
     ANEMOMETER_RADIUS_CM = 9.0 # Radius of your anemometer
-    def __init__(self):
+    def __init__(self, **stn_dict):
         """ Initialize Object. """
-        bme280_port = 1
-        self.bme280_address = 0x76 
+        bme280_port = stn_dict.get('bme280_port')
+        anemometer_pin = stn_dict.get('anemometer_pin')
+        rain_bucket_pin = stn_dict.get('rain_bucket_pin')
+        channel = stn_dict.get('mcp3008_channel')
+        self.bme280_address = stn_dict.get('bme280_address')
         self.bme280_bus = smbus2.SMBus(bme280_port)
         self.bme280_sensor = bme280
         self.bme280_sensor.load_calibration_params(self.bme280_bus,
                                                    self.bme280_address)
         self.wind_count = 0 # Counts how many half-rotations
         self.rain_count = 0
-        self.wind_speed_sensor = Button(5)
+        self.wind_speed_sensor = Button(anemometer_pin)
         self.wind_speed_sensor.when_pressed = self.spin
-        self.rain_sensor = Button(6)
+        self.rain_sensor = Button(rain_bucket_pin)
         self.rain_sensor.when_pressed = self.bucket_tipped
-        self.wind_vane = WindVane(channel=0)
+        self.wind_vane = WindVane(channel)
         self.temp_probe = DS18B20()
         self.data = self.get_data() #generator function you can loop through
 
@@ -133,7 +155,7 @@ class ByowsRpiStation(object):
         """ Function that returns wind as a vector (speed, direction) in a
         period of time (length) in seconds. """
         self.reset_wind()
-        wind_direction = self.wind_vane.get_value(length) # runs for interval seconds
+        wind_direction = self.wind_vane.get_value(length) # runs for i seconds
         wind_speed = self.calculate_speed(length)
         return wind_speed, wind_direction
         
