@@ -69,11 +69,11 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         anemometer_radius_cm = stn_dict.get('anemometer_radius_cm')
         
         settings = dict()
-        settings['anemometer_pin'] = stn_dict.get('anemometer_pin', 5)
-        settings['rain_bucket_pin'] = stn_dict.get('rain_bucket_pin', 6)
-        settings['bme280_port'] = stn_dict.get('bme280_port', 1)
-        settings['bme280_address'] = stn_dict.get('bme280_address', 0x76)
-        settings['mcp3008_channel'] = stn_dict.get('mcp3008_channel', 0)
+        settings['anemometer_pin'] = int(stn_dict.get('anemometer_pin', 5))
+        settings['rain_bucket_pin'] = int(stn_dict.get('rain_bucket_pin', 6))
+        settings['bme280_port'] = int(stn_dict.get('bme280_port', 1))
+        settings['bme280_address'] = int(stn_dict.get('bme280_address', 0x76), 16)
+        settings['mcp3008_channel'] = int(stn_dict.get('mcp3008_channel', 0))
         
         loginf('using driver %s' % DRIVER_NAME)
         loginf('driver version is %s' % DRIVER_VERSION)
@@ -81,11 +81,11 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         self.station = ByowsRpiStation(**settings)
         
         if adjustment != None:
-            self.station.ADJUSTMENT = adjustment
+            self.station.ADJUSTMENT = float(adjustment)
         if bucket_size != None:
-            self.station.BUCKET_SIZE = bucket_size
+            self.station.BUCKET_SIZE = float(bucket_size)
         if anemometer_radius_cm != None:
-            self.station.ANEMOMETER_RAIUS_CM = anemometer_radius_cm
+            self.station.ANEMOMETER_RAIUS_CM = float(anemometer_radius_cm)
         
     @property
     def hardware_name(self):
