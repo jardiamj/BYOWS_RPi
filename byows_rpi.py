@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 """
-Copyright 2018 Jardi A. Martinez Jordan <jardiamj@gmail.com>
+Copyright 2019 Jardi A. Martinez Jordan <jardiamj@gmail.com>
 
 This is an weeWX driver implementation of the Build Your OWN Weather
-Station usin the Raspberry Pi: 
+Station using the Raspberry Pi: 
 https://projects.raspberrypi.org/en/projects/build-your-own-weather-station/
 
 This program is free software: you can redistribute it and/or modify
@@ -72,7 +72,7 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         settings['anemometer_pin'] = int(stn_dict.get('anemometer_pin', 5))
         settings['rain_bucket_pin'] = int(stn_dict.get('rain_bucket_pin', 6))
         settings['bme280_port'] = int(stn_dict.get('bme280_port', 1))
-        settings['bme280_address'] = int(stn_dict.get('bme280_address', 0x76), 16)
+        settings['bme280_address'] = int(stn_dict.get('bme280_address', 0x77), 16)
         settings['mcp3008_channel'] = int(stn_dict.get('mcp3008_channel', 0))
         
         loginf('using driver %s' % DRIVER_NAME)
