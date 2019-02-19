@@ -64,7 +64,7 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
     """
     def __init__(self, **stn_dict):
         self.hardware = stn_dict.get('hardware', "BYOWS - Raspberry Pi")
-        self.loop_interval = stn_dict.get('loop_interval', 5)
+        self.loop_interval = float(stn_dict.get('loop_interval', 5))
         params = dict()
         params['anem_pin'] = int(stn_dict.get('anemometer_pin', 5))
         params['rain_bucket_pin'] = int(stn_dict.get('rain_bucket_pin', 6))
