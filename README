@@ -44,6 +44,9 @@ you will need to set that option here.
     # The driver to use.
     driver = user.byows_rpi
 
+    # How often should the driver generate packets in seconds
+    loop_interval = 2.5
+
     # Pin to which anemometer is connected, the DEFAULT is pin 5.
     anemometer_pin = 5
     
