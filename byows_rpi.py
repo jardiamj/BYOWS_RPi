@@ -162,10 +162,7 @@ class DS18B20(object):
     """
     def __init__(self):
         w1_devices = glob.glob("/sys/bus/w1/devices/28*")
-        if len(w1_devices) > 0:
-            self.device_file = glob.glob("/sys/bus/w1/devices/28*")[0] + "/w1_slave"
-        else:
-            self.device_file = None
+        self.device_file = w1_devices[0] + '/w1_slave' if len(w1_devices) > 0 else None
 
     def read_temp_raw(self):
         if self.device_file != None:
@@ -252,8 +249,9 @@ class WindGauge(object):
         return final_speed
 
     def read_direction(self):
-        wind =round(self.adc.value*3.3,1)
+        wind = round(self.adc.value*3.3,1)
         if not wind in self.WIND_VANE_VOLTS: # keep only good measurements
+            logdbg('unknown Wind Vane value: %s' % str(wind))
             return None
         else:
             return self.WIND_VANE_VOLTS[wind]
@@ -264,7 +262,9 @@ class WindGauge(object):
         # print("Measuring wind direction for %d seconds..." % length)
         start_time = time.time()
         while time.time() - start_time <= length:
-            data.append(self.read_direction())
+            direction = self.read_direction()
+            if direction is not None:
+                data.append(direction)
         return get_average(data)
 
 
