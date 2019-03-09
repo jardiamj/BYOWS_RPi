@@ -34,7 +34,7 @@ import smbus2
 import weewx.drivers
 
 DRIVER_NAME = 'BYOWS'
-DRIVER_VERSION = '0.4'
+DRIVER_VERSION = '0.44'
 
 
 def loader(config_dict, _):
@@ -104,7 +104,6 @@ class ByowsRpiStation(object):
         self.bme280_sensor.load_calibration_params(self.bme280_bus,
                                                    self.bme280_address)
         self.bucket_size = params.get('bucket_size')
-        self.wind_count = 0 # Counts how many half-rotations
         self.rain_count = 0
         self.wind_gauge = WindGauge(params.get('mcp3008_channel'),
                                     params.get('anem_pin'),
@@ -136,11 +135,10 @@ class ByowsRpiStation(object):
         return rainfall
 
     def get_data(self, interval=5):
-        """ Generates data packets every second. Rain packet gets generated only
-        if there are any rain clicks registered and windSpeed gets generated
-        every 5 packet loops (about 5 seconds). """
+        """ Generates data packets every time interval. """
         data = dict()
-        wind_speed, wind_dir = self.wind_gauge.get_wind_speed(interval) # default 5 seconds
+        wind_speed, wind_dir = self.wind_gauge.get_wind(interval) # default 5 seconds
+        self.wind_gauge.reset_wind() # reset wind_count and last time reading
         humidity, pressure, ambient_temp = self.get_bme280_data()
         data['outHumidity'] = humidity
         data['pressure'] = pressure
@@ -148,6 +146,7 @@ class ByowsRpiStation(object):
         data['soilTemp1'] = self.get_soil_temp()
         data['windSpeed'] = float(wind_speed)
         data['windDir'] = wind_dir
+        data['instantWindDir'] = self.wind_gauge.read_direction()
         data['rain'] = float(self.get_rainfall())
         return data
 
@@ -215,6 +214,7 @@ class WindGauge(object):
         # pass channel of MCP3008 where wind vane is connected to
         self.adc = MCP3008(channel)
         self.wind_count = 0 # Counts how many half-rotations
+        self.last_wind_time = time.time()
         self.wind_speed_sensor = Button(anem_pin)
         self.wind_speed_sensor.when_pressed = self.spin
         self.anemometer_radius_cm = anem_radius # Radius of your anemometer
@@ -226,15 +226,16 @@ class WindGauge(object):
 
     def reset_wind(self):
         self.wind_count = 0
+        self.last_wind_time = time.time()
 
-    def get_wind_speed(self,length=5):
-        """ Function that returns wind as a vector (speed, direction) in a
-        period of time (length) in seconds. """
-        self.reset_wind()
-        wind_direction = self.get_average_direction(length) # runs for length seconds
-        # wind turns acumulate for length seconds an then we calculate it
-        wind_speed = self.calculate_speed(length)
-        return wind_speed, wind_direction
+    def get_wind_speed(self):
+        """ Function that returns wind speed in km/hr. """
+        return self.calculate_speed(time.time() - self.last_wind_time)
+
+    def get_wind(self, length=5):
+        """ Function that returns wind as a vector: speed, direction."""
+        wind_dir = self.get_average_direction(length) #runs for lenght seconds
+        return self.get_wind_speed(), wind_dir
 
     def calculate_speed(self, time_sec):
         circumference_cm = (2 * math.pi) * self.anemometer_radius_cm
@@ -300,26 +301,8 @@ if __name__ == '__main__':
     packet = {'dateTime': int(time.time() + 0.5),
               'usUnits': weewx.METRIC}
 
-    interval = 0
+    interval = 5
 
-    for x in range(5):
-        start_time = time.time()
-        time.sleep(1)
-        ground_temp = station.get_soil_temp()
-        humidity, pressure, ambient_temp = station.get_bme280_data()
-        wind_direction = station.get_wind_direction()
-
-        packet['outTemp'] = float( ambient_temp )
-        packet['outHumidity'] = float( humidity )
-        packet['soilTemp1'] = float( ground_temp )
-        packet['pressure'] = float( pressure )
-        packet['windDir'] = wind_direction
-        x += 1
-        interval += time.time() - start_time
-        print packet
-
-    wind_speed = station.get_wind_speed(interval)
-    rainfall = station.get_rainfall()
-    packet['rain'] = rainfall
-    packet['windSpeed'] = float( wind_speed )
-    print packet
+    data = station.get_data(interval) # defaults to 5 seconds
+    packet.update(data)
+    print(packet)
