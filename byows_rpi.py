@@ -34,7 +34,7 @@ import smbus2
 import weewx.drivers
 
 DRIVER_NAME = 'BYOWS'
-DRIVER_VERSION = '0.44'
+DRIVER_VERSION = '0.5'
 
 
 def loader(config_dict, _):
@@ -88,9 +88,11 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         while True:
             packet = {'dateTime': int(time.time() + 0.5),
                     'usUnits': weewx.METRIC}
-            data = self.station.get_data(self.loop_interval) # defaults to 5 seconds
+            data = self.station.get_data() # defaults to 5 seconds
             packet.update(data)
             yield packet
+            time.sleep(self.loop_interval)
+
 
 class ByowsRpiStation(object):
     """ Object that represents a BYOWS_Station. """
@@ -103,7 +105,7 @@ class ByowsRpiStation(object):
         self.bme280_sensor = bme280
         self.bme280_sensor.load_calibration_params(self.bme280_bus,
                                                    self.bme280_address)
-        self.bucket_size = params.get('bucket_size')
+        self.bucket_size = params.get('bucket_size') # in mm
         self.rain_count = 0
         self.wind_gauge = WindGauge(params.get('mcp3008_channel'),
                                     params.get('anem_pin'),
@@ -130,15 +132,15 @@ class ByowsRpiStation(object):
         return self.temp_probe.read_temp()
 
     def get_rainfall(self):
-        rainfall = self.rain_count * self.bucket_size
+        """ Returns rainfall in cm. """
+        rainfall = (self.rain_count * self.bucket_size)/10.0
         self.reset_rainfall()
         return rainfall
 
-    def get_data(self, interval=5):
+    def get_data(self):
         """ Generates data packets every time interval. """
         data = dict()
-        wind_speed, wind_dir = self.wind_gauge.get_wind(interval) # default 5 seconds
-        self.wind_gauge.reset_wind() # reset wind_count and last time reading
+        wind_speed, wind_dir = self.wind_gauge.get_wind()
         humidity, pressure, ambient_temp = self.get_bme280_data()
         data['outHumidity'] = humidity
         data['pressure'] = pressure
@@ -230,11 +232,14 @@ class WindGauge(object):
 
     def get_wind_speed(self):
         """ Function that returns wind speed in km/hr. """
-        return self.calculate_speed(time.time() - self.last_wind_time)
+        wind_speed = self.calculate_speed(time.time() - self.last_wind_time)
+        self.reset_wind() # reset wind_count and last time reading
+        return wind_speed
 
     def get_wind(self, length=5):
         """ Function that returns wind as a vector: speed, direction."""
-        wind_dir = self.get_average_direction(length) #runs for lenght seconds
+        # wind_dir = self.get_average_direction(length) #runs for lenght seconds
+        wind_dir = self.read_direction()
         return self.get_wind_speed(), wind_dir
 
     def calculate_speed(self, time_sec):
@@ -252,7 +257,7 @@ class WindGauge(object):
     def read_direction(self):
         wind = round(self.adc.value*3.3,1)
         if not wind in self.WIND_VANE_VOLTS: # keep only good measurements
-            logdbg('unknown Wind Vane value: %s' % str(wind))
+            logdbg('Unknown Wind Vane value: %s' % str(wind))
             return None
         else:
             return self.WIND_VANE_VOLTS[wind]
