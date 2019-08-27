@@ -34,8 +34,7 @@ import smbus2
 import weewx.drivers
 
 DRIVER_NAME = 'BYOWS'
-DRIVER_VERSION = '0.5'
-
+DRIVER_VERSION = '0.51'
 
 def loader(config_dict, _):
     return ByowsRpi(**config_dict[DRIVER_NAME])
@@ -88,10 +87,10 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         while True:
             packet = {'dateTime': int(time.time() + 0.5),
                     'usUnits': weewx.METRIC}
-            data = self.station.get_data() # defaults to 5 seconds
+            data = self.station.get_data()
             packet.update(data)
             yield packet
-            time.sleep(self.loop_interval)
+            time.sleep(self.loop_interval) # defaults to 5 seconds
 
 
 class ByowsRpiStation(object):
@@ -140,6 +139,8 @@ class ByowsRpiStation(object):
     def get_data(self):
         """ Generates data packets every time interval. """
         data = dict()
+        anem_rotations = self.wind_gauge.wind_count/2.0
+        time_interval = self.wind_gauge.last_wind_time - time.time()
         wind_speed, wind_dir = self.wind_gauge.get_wind()
         humidity, pressure, ambient_temp = self.get_bme280_data()
         data['outHumidity'] = humidity
@@ -148,8 +149,9 @@ class ByowsRpiStation(object):
         data['soilTemp1'] = self.get_soil_temp()
         data['windSpeed'] = float(wind_speed)
         data['windDir'] = wind_dir
-        data['instantWindDir'] = self.wind_gauge.read_direction()
         data['rain'] = float(self.get_rainfall())
+        data['anemRotations'] = anem_rotations
+        data['timeAnemInterval'] = time_interval
         return data
 
     def reset_rainfall(self):
@@ -238,9 +240,7 @@ class WindGauge(object):
 
     def get_wind(self, length=5):
         """ Function that returns wind as a vector: speed, direction."""
-        # wind_dir = self.get_average_direction(length) #runs for lenght seconds
-        wind_dir = self.read_direction()
-        return self.get_wind_speed(), wind_dir
+        return self.get_wind_speed(), self.read_direction()
 
     def calculate_speed(self, time_sec):
         circumference_cm = (2 * math.pi) * self.anemometer_radius_cm
