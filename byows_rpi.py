@@ -303,29 +303,29 @@ class WindGauge(object):
         return get_average(data)
 
 
-def get_average(angles):
-    # Function that returns the average angle from a list of angles
-    sin_sum = 0.0
-    cos_sum = 0.0
+    def get_average(angles):
+        # Function that returns the average angle from a list of angles
+        sin_sum = 0.0
+        cos_sum = 0.0
 
-    for angle in angles:
-        r = math.radians(angle)
-        sin_sum += math.sin(r)
-        cos_sum += math.cos(r)
-    flen = float(len(angles))
-    s = sin_sum / flen
-    c = cos_sum / flen
-    arc = math.degrees(math.atan(s / c))
-    average = 0.0
+        for angle in angles:
+            r = math.radians(angle)
+            sin_sum += math.sin(r)
+            cos_sum += math.cos(r)
+        flen = float(len(angles))
+        s = sin_sum / flen
+        c = cos_sum / flen
+        arc = math.degrees(math.atan(s / c))
+        average = 0.0
 
-    if s > 0 and c > 0:
-        average = arc
-    elif c < 0:
-        average = arc + 180
-    elif s < 0 and c > 0:
-        average = arc + 360
+        if s > 0 and c > 0:
+            average = arc
+        elif c < 0:
+            average = arc + 180
+        elif s < 0 and c > 0:
+            average = arc + 360
 
-    return 0.0 if average == 360 else average
+        return 0.0 if average == 360 else average
 
 
 """ Section for testing purposes, so file can be run outside of weeWX.
