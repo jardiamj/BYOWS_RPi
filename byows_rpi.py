@@ -147,7 +147,7 @@ class ByowsRpiStation(object):
         self.reset_rainfall()
         return rainfall
 
-    def get_data(self):
+    def get_data(self, data):
         """ Generates data packets every time interval. """
         data = dict()
         anem_rotations = self.wind_gauge.wind_count / 2.0
