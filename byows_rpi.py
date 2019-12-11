@@ -93,7 +93,7 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         data generator function. """
         while True:
             packet = {"dateTime": int(time.time() + 0.5), "usUnits": weewx.METRIC}
-            data = self.station.get_data()
+            data = self.station.get_data(self)
             packet.update(data)
             yield packet
             time.sleep(self.loop_interval)  # defaults to 5 seconds
