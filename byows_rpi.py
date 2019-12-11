@@ -331,6 +331,7 @@ class WindGauge(object):
 """ Section for testing purposes, so file can be run outside of weeWX.
     invoke this as follows from the weewx root dir:
     PYTHONPATH=bin python bin/weewx/drivers/byows_rpi.py"""
+    
 if __name__ == "__main__":
     station = ByowsRpiStation()
     packet = {"dateTime": int(time.time() + 0.5), "usUnits": weewx.METRIC}
