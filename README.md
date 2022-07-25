@@ -32,12 +32,12 @@ the byows_rpi driver.
 
 Optional parameters configurable in the "[BYOWS]" Section:
 
-* loop_interval : How often should the driver generate packets in seconds. Default is 2.5 seconds
-* anemometer_pin : Pin to which anemometer is connected, the DEFAULT is pin 5.
-* rain_bucket_pin : Pin to which rain bucket is connected, the DEFAULT is pin 6.
-* bme280_port : port for sensor bme280. The default value is 1
-* bme280_address : The address for sensor bme280. The default address is 0x77
-* mcp3008_channel : Channel to which wind vane is connected to on MCP3008, The DEFAULT is channel 0
-* anemometer_adjustment : Anemometer adjustment value, the DEFAULT is 1.18
-* bucket_size : Bucket Size in mm, the DEFAULT is 0.2794 mm.
-* anemometer_radius_cm : Anemometer radius in cm, the DEFAULT is 9.0 cm.    
+* **loop_interval** : How often should the driver generate packets in seconds. Default is 2.5 seconds
+* **anemometer_pin** : Pin to which anemometer is connected, the DEFAULT is pin 5.
+* **rain_bucket_pin** : Pin to which rain bucket is connected, the DEFAULT is pin 6.
+* **bme280_port** : port for sensor bme280. The default value is 1
+* **bme280_address** : The address for sensor bme280. The default address is 0x77
+* **mcp3008_channel** : Channel to which wind vane is connected to on MCP3008, The DEFAULT is channel 0
+* **anemometer_adjustment** : Anemometer adjustment value, the DEFAULT is 1.18
+* **bucket_size** : Bucket Size in mm, the DEFAULT is 0.2794 mm.
+* **anemometer_radius_cm** : Anemometer radius in cm, the DEFAULT is 9.0 cm.    
