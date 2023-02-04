@@ -20,6 +20,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 """
+import logging  #This supports the new WeeWX 4.x logging methodology
 import math
 import syslog
 import time
@@ -36,6 +37,8 @@ import weewx.drivers
 DRIVER_NAME = "BYOWS"
 DRIVER_VERSION = "0.51"
 
+#Initialize the logger for this module
+log = logging.getLogger(__name__)
 
 def loader(config_dict, _):
     return ByowsRpi(**config_dict[DRIVER_NAME])
@@ -45,22 +48,6 @@ def loader(config_dict, _):
 def confeditor_loader():
     return ByowsRpiConfEditor()
 """
-
-
-def logmsg(level, msg):
-    syslog.syslog(level, "BYOWS RPi: %s" % msg)
-
-
-def logdbg(msg):
-    logmsg(syslog.LOG_DEBUG, msg)
-
-
-def loginf(msg):
-    logmsg(syslog.LOG_INFO, msg)
-
-
-def logerr(msg):
-    logmsg(syslog.LOG_ERR, msg)
 
 
 class ByowsRpi(weewx.drivers.AbstractDevice):
@@ -80,8 +67,8 @@ class ByowsRpi(weewx.drivers.AbstractDevice):
         params["anem_adjustment"] = float(stn_dict.get("anemometer_adjustment", 1.18))
         params["bucket_size"] = float(stn_dict.get("bucket_size", 0.2794))
         params["anem_radius_cm"] = float(stn_dict.get("anemometer_radius_cm", 9.0))
-        loginf("using driver %s" % DRIVER_NAME)
-        loginf("driver version is %s" % DRIVER_VERSION)
+        log.info("using driver %s" % DRIVER_NAME)
+        log.info("driver version is %s" % DRIVER_VERSION)
         self.station = ByowsRpiStation(**params)
 
     @property
@@ -133,7 +120,7 @@ class ByowsRpiStation(object):
             pressure = data.pressure
             temperature = data.temperature
         except:
-            logdbg("Error sampling sensor bme280, passing None as data.")
+            log.debug("Error sampling sensor bme280, passing None as data.")
             humidity, pressure, temperature = None, None, None
             pass
         return humidity, pressure, temperature
@@ -286,7 +273,7 @@ class WindGauge(object):
     def read_direction(self):
         wind = round(self.adc.value * 3.3, 1)
         if not wind in self.WIND_VANE_VOLTS:  # keep only good measurements
-            logdbg("Unknown Wind Vane value: %s" % str(wind))
+            log.debug("Unknown Wind Vane value: %s" % str(wind))
             return None
         else:
             return self.WIND_VANE_VOLTS[wind]

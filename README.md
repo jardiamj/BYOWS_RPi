@@ -8,87 +8,36 @@ Distributed under terms of the GPLv3
 
 # Installation
 
-Download the byows_rpi.py file and copy it to your weeWX user directory.
-In Debian it is: /usr/share/weewx/user
-
+download the latest release (v0.51) from GitHub into your WeeWx directory
 ```
-wget https://github.com/jardiamj/BYOWS_RPi/blob/master/byows_rpi.py -O /usr/share/weewx/user/byows_rpi.py
+wget https://github.com/ddjlabs/BYOWS_RPi/archive/refs/tags/v0.51.zip
 ```
 
-You could install the driver by using git to clone the project into the weewx user folder:
+Once it is downloaded, run the WeeWX Extension installer. This will install the driver and add the default configuration items to your WeeWX.conf file
 
-git clone https://github.com/jardiamj/BYOWS_RPI.git .
-    
-That will also copy a directory named "files", those files are not necessary for
-the driver to work, they are there for my own documenting purposes.
+```
+sudo ./bin/wee_extension --install v0.51.zip
+```
+
 
 ## Configuration
 
-To enable the byows_rpi driver modify the /etc/weewx/weewx.conf file and change 
-the "station_type" variable to "BYOWS" in the "[Station]" section. Below is a snippet of the
-configured station section.
+To enable the byows_rpi driver modify the weewx.conf file and change 
+the "station_type" variable to "BYOWS" in the "[Station]" section. Configure the driver by looking for the BYOWS stanza at the end of the file.
 
-```plaintext
-[Station]  
-    ...
-    # Set to type of station hardware. There must be a corresponding stanza
-    # in this file with a 'driver' parameter indicating the driver to be used.
-    station_type = BYOWS
-```
-Then add an new section called "[BYOWS]" preferably below the "[Station]" section.
-
-```plaintext
-[BYOWS]
-    # This section is for the Raspberry Pi Bring Your Own Weather Station driver.
-    
-    # [REQUIRED]
-    # The driver to use.
-    driver = user.byows_rpi
-```
 
 If you are using different hardware or connecting them to a different pin or port, you are able
 to add additional variables in the "[BYOWS]" section and thereby overwriting the default values in
-the byows_rpi driver. Please see 
+the byows_rpi driver.
 
+Optional parameters configurable in the "[BYOWS]" Section:
 
-```plaintext
-[BYOWS]
-    # This section is for the Raspberry Pi Bring Your Own Weather Station driver.
-
-    # [REQUIRED]
-    # The driver to use.
-    driver = user.byows_rpi
-
-    # [OPTIONAL]
-    # How often should the driver generate packets in seconds
-    loop_interval = 2.5
-
-    # [OPTIONAL]
-    # Pin to which anemometer is connected, the DEFAULT is pin 5.
-    anemometer_pin = 5
-    
-    # [OPTIONAL]
-    # Pin to which rain bucket is connected, the DEFAULT is pin 6.
-    rain_bucket_pin = 6
-    
-    # [OPTIONAL]
-    # Port and address for sensor bme280, the DEFAULT are port=1 address=0x77
-    bme280_port = 1
-    bme280_address = 0x77
-    
-    # [OPTIONAL]
-    # Channel to which wind vane is connected to on MCP3008, The DEFAULT is channel 0
-    mcp3008_channel = 0
-    
-    # [OPTIONAL]
-    # Anemometer adjustment value, the DEFAULT is 1.18
-    anemometer_adjustment = 1.18
-    
-    # [OPTIONAL]
-    # Bucket Size in mm, the DEFAULT is 0.2794 mm.
-    bucket_size = 0.2794
-    
-    # [OPTIONAL]
-    # Anemometer radious in cm, the DEFAULT is 9.0 cm.    
-    anemometer_radius_cm = 9.0
-```
+* **loop_interval** : How often should the driver generate packets in seconds. Default is 2.5 seconds
+* **anemometer_pin** : Pin to which anemometer is connected, the DEFAULT is pin 5.
+* **rain_bucket_pin** : Pin to which rain bucket is connected, the DEFAULT is pin 6.
+* **bme280_port** : port for sensor bme280. The default value is 1
+* **bme280_address** : The address for sensor bme280. The default address is 0x77
+* **mcp3008_channel** : Channel to which wind vane is connected to on MCP3008, The DEFAULT is channel 0
+* **anemometer_adjustment** : Anemometer adjustment value, the DEFAULT is 1.18
+* **bucket_size** : Bucket Size in mm, the DEFAULT is 0.2794 mm.
+* **anemometer_radius_cm** : Anemometer radius in cm, the DEFAULT is 9.0 cm.    
