@@ -32,6 +32,12 @@ import os, glob
 import bme280
 import smbus2
 
+# Imports needed for the ADS1015 analog to digital converter
+import board
+import busio
+import adafruit_ads1x15.ads1015 as ADS
+from adafruit_ads1x15.analog_in import AnalogIn
+
 import weewx.drivers
 
 DRIVER_NAME = "BYOWS"
@@ -235,7 +241,13 @@ class WindGauge(object):
 
     def __init__(self, channel=0, anem_pin=5, anem_radius=9.0, anem_adjustment=1.18):
         # pass channel of MCP3008 where wind vane is connected to
-        self.adc = MCP3008(channel)
+        # self.adc = MCP3008(channel)
+
+        # Temporary test for ADS1015
+        i2c = busio.I2C(board.SCL, board.SDA)
+        ads = ADS.ADS1015(i2c)
+        self.adc = AnalogIn(ads, channel)
+
         self.wind_count = 0  # Counts how many half-rotations
         self.last_wind_time = time.time()
         self.wind_speed_sensor = Button(anem_pin)
@@ -274,12 +286,15 @@ class WindGauge(object):
         return final_speed
 
     def read_direction(self):
-        wind = round(self.adc.value * 3.3, 1)
-        if not wind in self.WIND_VANE_VOLTS:  # keep only good measurements
-            log.debug("Unknown Wind Vane value: %s" % str(wind))
+        # wind = round(self.adc.value * 3.3, 1)
+        # Test for ADS1015
+        win_volts = round(self.adc.voltage, 1)
+
+        if not wind_volts in self.WIND_VANE_VOLTS:  # keep only good measurements
+            log.debug("Unknown Wind Vane value: %s" % str(wind_volts))
             return None
         else:
-            return self.WIND_VANE_VOLTS[wind]
+            return self.WIND_VANE_VOLTS[wind_volts]
 
     def get_average_direction(self, length=5):
         # Get the average wind direction in a length of time in seconds
