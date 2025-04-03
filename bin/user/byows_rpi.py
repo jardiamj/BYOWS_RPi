@@ -177,7 +177,10 @@ class DS18B20(object):
             return None
 
     def crc_check(self, lines):
-        return lines[0].strip()[-3:] == "YES"
+        if len(linex[0].strip()) > 0:
+            return lines[0].strip()[-3:] == "YES"
+        else:
+            return False
 
     def read_temp(self):
         temp_c = -255
