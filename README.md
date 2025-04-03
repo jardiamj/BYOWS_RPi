@@ -10,13 +10,13 @@ Distributed under terms of the GPLv3
 
 download the latest release (v0.51) from GitHub into your WeeWx directory
 ```
-wget https://github.com/ddjlabs/BYOWS_RPi/archive/refs/tags/v0.51.zip
+wget https://github.com/jardiamj/BYOWS_RPi/archive/refs/tags/v1.0.0.zip
 ```
 
 Once it is downloaded, run the WeeWX Extension installer. This will install the driver and add the default configuration items to your WeeWX.conf file
 
 ```
-sudo ./bin/wee_extension --install v0.51.zip
+sudo ./bin/wee_extension --install v1.0.0.zip
 ```
 
 
