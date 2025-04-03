@@ -9,7 +9,7 @@ from io import StringIO
 
 
 # ----- Extension Information -----
-VERSION = "0.51"
+VERSION = "1.0.0"
 NAME = 'byows_rpi'
 PACKAGE_DESCRIPTION = 'Bring Your Own Weather Station (BYOWS) Driver for the Raspberry Pi'
 AUTHOR = "Jardi Martinez"

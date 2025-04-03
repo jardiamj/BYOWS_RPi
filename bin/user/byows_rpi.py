@@ -35,7 +35,7 @@ import smbus2
 import weewx.drivers
 
 DRIVER_NAME = "BYOWS"
-DRIVER_VERSION = "0.51"
+DRIVER_VERSION = "1.0.0"
 
 #Initialize the logger for this module
 log = logging.getLogger(__name__)
